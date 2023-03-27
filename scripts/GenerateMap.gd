@@ -57,11 +57,22 @@ func _ready():
 		while road_instances:
 			road_instances[0].queue_free()
 			road_instances.erase(road_instances[0])
-			
+
 		make_roads()
 		erase_walls()
+		Globals.roads = roads
 		draw_roads()
-		yield(get_tree().create_timer(1), "timeout")
+		for i in range (300):
+			var scene = load("res://Person.tscn")
+			var scene_instance = scene.instance().duplicate()
+			scene_instance.set_name("person_"+str(i))
+			var child = scene_instance.get_child(0)
+			child.translation.x = rand_range(-29, -29)
+			child.translation.z = rand_range(-29, -29)
+			add_child(scene_instance)
+			yield(get_tree().create_timer(0.1), "timeout")
+
+#		yield(get_tree().create_timer(1), "timeout")
 
 func check_neighbors(cell, unvisited):
 	# returns an array of cell's unvisited neighbors
