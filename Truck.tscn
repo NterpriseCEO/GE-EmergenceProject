@@ -1,0 +1,40 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://scripts/Move.gd" type="Script" id=1]
+[ext_resource path="res://TruckModel.tscn" type="PackedScene" id=2]
+
+[sub_resource type="CapsuleShape" id=9]
+
+[sub_resource type="GDScript" id=10]
+script/source = "extends Spatial
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+var car = load(\"res://CarModel.tscn\")
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	var instance = car.instance().duplicate()
+	add_child(instance)
+	pass
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#	pass
+"
+
+[node name="Car" type="Spatial"]
+
+[node name="Car" type="KinematicBody" parent="."]
+script = ExtResource( 1 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Car"]
+unique_name_in_owner = true
+transform = Transform( 0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0.15, 0 )
+shape = SubResource( 9 )
+script = SubResource( 10 )
+
+[node name="truck" parent="Car/CollisionShape" instance=ExtResource( 2 )]

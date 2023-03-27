@@ -17,10 +17,13 @@ var dir = 0
 
 var crossRoadsDirectionOptions = [
 	[0, 1, 3],
-	[2, 1, 3],
-	[1, 0, 2],
-	[3, 0, 2]
+	[0, 1, 2],
+	[1, 2, 3],
+	[0, 2, 3]
 ]
+
+var xPos = 0
+var zPos = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -41,15 +44,31 @@ func _process(delta):
 
 func _physics_process(var delta):
 	if len(path) == 200:
+#		if velocity.x > 0.5:
+#			xPos = 0.3
+#		elif velocity.x < -0.5:
+#			xPos = -0.3
+#		else:
+#			xPos = 0
+#
+#		if velocity.z > -0.5:
+#			zPos = -0.3
+#		elif velocity.z < -0.5:
+#			zPos = 0.3
+
 		force = followPath()
-		acceleration = force / 1
+		acceleration = force / 0.5
 		velocity += acceleration * delta
 		speed = velocity.length()
 		
 		if speed > 0:
 			velocity = velocity.limit_length(1)
 			transform.origin += velocity * delta
+			transform.origin.y = 0
 			move_and_slide(velocity)
+
+		var tempUp = transform.basis.y.linear_interpolate(Vector3.UP + (acceleration * 0.1), delta * 5.0)
+		look_at(global_transform.origin - velocity, tempUp)
 
 # here dir can be 0, 2, 3 or 3 which equals
 # right, down, left or up
@@ -139,7 +158,7 @@ func followPath():
 	var target = path[pathIndex]
 	var dist = global_transform.origin.distance_to(target)
 	
-	if dist < 1:
+	if dist < 0.5:
 		pathIndex = (pathIndex + 1) % len(path)
 	
 	return seek(path[pathIndex])

@@ -8,6 +8,16 @@
 
 config_version=4
 
+_global_script_classes=[ {
+"base": "SteeringBehavior",
+"class": "Avoidance",
+"language": "GDScript",
+"path": "res://scripts/ObstacleAvoidance.gd"
+} ]
+_global_script_class_icons={
+"Avoidance": ""
+}
+
 [application]
 
 config/name="Ge- Emergence Project"

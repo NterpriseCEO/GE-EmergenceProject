@@ -63,14 +63,19 @@ func _ready():
 		Globals.roads = roads
 		draw_roads()
 		for i in range (300):
-			var scene = load("res://Person.tscn")
-			var scene_instance = scene.instance().duplicate()
-			scene_instance.set_name("person_"+str(i))
-			var child = scene_instance.get_child(0)
+			var vehicle = load("res://" + ("Truck" if randi()%2 == 0 else "Car") + ".tscn")
+			var vehicle_instance = vehicle.instance().duplicate()
+			vehicle_instance.set_name("person_"+str(i))
+			var child = vehicle_instance.get_child(0)
+			var model = child.get_child(0).get_child(0).get_child(0)
+			var mat = model.get_surface_material(0).duplicate()
+			randomize()
+			mat.albedo_color = Color(randf(), randf(), randf(), randf())
+			model.set_surface_material(0, mat)
 			child.translation.x = rand_range(-29, -29)
 			child.translation.z = rand_range(-29, -29)
-			add_child(scene_instance)
-			yield(get_tree().create_timer(0.1), "timeout")
+			add_child(vehicle_instance)
+			yield(get_tree().create_timer(1), "timeout")
 
 #		yield(get_tree().create_timer(1), "timeout")
 
@@ -129,7 +134,7 @@ func draw_roads():
 		if road_textures[roads[road]] == "empty_cell":
 			var building
 			# Randomly decides to draw one of 2 building types
-			if randf() > 0.7:
+			if randf() > 0.5:
 				var y_pos = 1
 				if randf() > 0.5:
 					y_pos = 2
@@ -143,7 +148,7 @@ func draw_roads():
 		else:
 			# Roads tiles are placed here and the correct texture
 			var physical_road = $road1.duplicate();
-			physical_road.translate(Vector3(-29+(road.x*2), 0.01, -29+(road.y*2)))
+			physical_road.translation = Vector3(-29+(road.x*2), 0.01, -29+(road.y*2))
 			var mat = physical_road.get_surface_material(0).duplicate()
 			mat.albedo_texture = tex
 			physical_road.set_surface_material(0, mat)
