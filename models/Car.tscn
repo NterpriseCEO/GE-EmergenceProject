@@ -17,3 +17,7 @@ transform = Transform( 0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0.15, 0 )
 shape = SubResource( 1 )
 
 [node name="car" parent="VehicleBody/CollisionShape" instance=ExtResource( 2 )]
+
+[node name="Spotlight" type="SpotLight" parent="VehicleBody"]
+transform = Transform( 1, 0, 0, 0, -1, 8.74228e-08, 0, -8.74228e-08, -1, 0, 0.15, 0.233616 )
+shadow_enabled = true

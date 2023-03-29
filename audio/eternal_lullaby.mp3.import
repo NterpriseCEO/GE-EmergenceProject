@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/eternal_lullaby.mp3-5a830bdb60db5b20802fecf47b055113.mp3str"
+
+[deps]
+
+source_file="res://audio/eternal_lullaby.mp3"
+dest_files=[ "res://.import/eternal_lullaby.mp3-5a830bdb60db5b20802fecf47b055113.mp3str" ]
+
+[params]
+
+loop=true
+loop_offset=0
