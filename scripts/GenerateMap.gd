@@ -63,7 +63,7 @@ func _ready():
 		Globals.roads = roads
 		draw_roads()
 		for i in range (300):
-			var vehicle = load("res://" + ("Truck" if randi()%2 == 0 else "Car") + ".tscn")
+			var vehicle = load("res://models/" + ("Truck" if randi()%2 == 0 else "Car") + ".tscn")
 			var vehicle_instance = vehicle.instance().duplicate()
 			vehicle_instance.set_name("person_"+str(i))
 			var child = vehicle_instance.get_child(0)
@@ -72,6 +72,7 @@ func _ready():
 			randomize()
 			mat.albedo_color = Color(randf(), randf(), randf(), randf())
 			model.set_surface_material(0, mat)
+			child.translation.y = 0.1
 			child.translation.x = rand_range(-29, -29)
 			child.translation.z = rand_range(-29, -29)
 			add_child(vehicle_instance)
@@ -132,19 +133,8 @@ func draw_roads():
 		var tex = load("res://textures/" + road_textures[roads[road]] + ".png")
 
 		if road_textures[roads[road]] == "empty_cell":
-			var building
 			# Randomly decides to draw one of 2 building types
-			if randf() > 0.5:
-				var y_pos = 1
-				if randf() > 0.5:
-					y_pos = 2
-					building = $building1.duplicate()
-				else:
-					building = $building2.duplicate()
-				building.translation = Vector3(-29+(road.x*2), y_pos, -29+(road.y*2))
-				road_instances.append(building)
-				self.add_child(building)
-				building.set_owner(self)
+			place_buildings(road)
 		else:
 			# Roads tiles are placed here and the correct texture
 			var physical_road = $road1.duplicate();
@@ -176,3 +166,35 @@ func erase_walls():
 				roads[cell+neighbor/2] = 5
 			else:
 				roads[cell+neighbor/2] = 10
+
+
+func place_buildings(road):
+	if randf() < 0.8:
+		var y_pos = 1
+		randomize()
+		var rand = randf()
+		var buildingNumber = 0
+		print(buildingNumber)
+		
+		if rand < 0.1:
+			buildingNumber = 1
+		elif rand < 0.2:
+			buildingNumber = 4
+		elif rand < 0.3:
+			buildingNumber = 3
+		else:
+			buildingNumber = 2
+		
+		var building = load("res://models/Building" + str(buildingNumber) + "Model.tscn").instance()
+
+		if buildingNumber == 1:
+			y_pos = 2
+		elif buildingNumber == 3:
+			y_pos = 0.5
+		elif buildingNumber == 4:
+			y_pos = 3
+		
+		building.translation = Vector3(-29+(road.x*2), y_pos, -29+(road.y*2))
+		road_instances.append(building)
+		self.add_child(building)
+		building.set_owner(self)

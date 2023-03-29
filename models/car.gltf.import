@@ -2,12 +2,12 @@
 
 importer="scene"
 type="PackedScene"
-path="res://.import/car.gltf-4faa1005012db680e08f62b415341723.scn"
+path="res://.import/car.gltf-dd9acb6689dc31b75b5154ee66914089.scn"
 
 [deps]
 
-source_file="res://car.gltf"
-dest_files=[ "res://.import/car.gltf-4faa1005012db680e08f62b415341723.scn" ]
+source_file="res://models/car.gltf"
+dest_files=[ "res://.import/car.gltf-dd9acb6689dc31b75b5154ee66914089.scn" ]
 
 [params]
 

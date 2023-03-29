@@ -1,4 +1,4 @@
-extends KinematicBody
+extends RigidBody
 
 # Declare member variables here. Examples:
 # var a = 2
@@ -43,7 +43,7 @@ func _process(delta):
 
 
 func _physics_process(var delta):
-	if len(path) == 200:
+	if len(path) == 10000:
 #		if velocity.x > 0.5:
 #			xPos = 0.3
 #		elif velocity.x < -0.5:
@@ -65,7 +65,7 @@ func _physics_process(var delta):
 			velocity = velocity.limit_length(1)
 			transform.origin += velocity * delta
 			transform.origin.y = 0
-			move_and_slide(velocity)
+			apply_impulse(velocity.rotated(Vector3.UP, rotation.y), Vector3.ZERO)
 
 		var tempUp = transform.basis.y.linear_interpolate(Vector3.UP + (acceleration * 0.1), delta * 5.0)
 		look_at(global_transform.origin - velocity, tempUp)
@@ -85,8 +85,8 @@ func generatePath():
 ##
 #	path.append(Vector3(-29 + (x*2), 0, -29 + (z*2)))
 
-	for i in range(200):
-#		print(x, " ", z)
+	for i in range(10000):
+
 		var nextRoad = Globals.roads[Vector2(x, z)]
 
 		path.append(Vector3(-29 + (x*2), 0, -29 + (z*2)))

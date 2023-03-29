@@ -2,12 +2,12 @@
 
 importer="scene"
 type="PackedScene"
-path="res://.import/truck.gltf-3bb24a4a9740b737828de19abfed8647.scn"
+path="res://.import/building1.gltf-2f3046ceebaaed27721ddcc0d9692361.scn"
 
 [deps]
 
-source_file="res://truck.gltf"
-dest_files=[ "res://.import/truck.gltf-3bb24a4a9740b737828de19abfed8647.scn" ]
+source_file="res://models/building1.gltf"
+dest_files=[ "res://.import/building1.gltf-2f3046ceebaaed27721ddcc0d9692361.scn" ]
 
 [params]
 
