@@ -27,7 +27,7 @@ func _input(event):
 	velocity.y = move_dir.y
 	velocity.z = move_dir.z
 	# Moves the camera
-	velocity = move_and_slide(velocity*SPEED)
+	velocity = move_and_slide((velocity*translation.y))
 
 	# clamps the y value between 2 and 100
 	translation.y = clamp(translation.y, 2, 100)

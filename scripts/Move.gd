@@ -5,6 +5,9 @@ extends RigidBody
 # var b = "text"
 var path = []
 
+var offset_x = 0
+var offset_z = 0
+
 var pathIndex = 0
 var velocity = Vector3.ZERO
 var force = 0
@@ -89,58 +92,109 @@ func generatePath():
 
 		var nextRoad = Globals.roads[Vector2(x, z)]
 
-		path.append(Vector3(-29 + (x*2), 0, -29 + (z*2)))
+		path.append(Vector3(-29 + (x*2) + offset_x, 0, -29 + (z*2) + offset_z))
+		offset_x = 0
+		offset_z = 0
 
 		match nextRoad:
 			0: # crossroads
 				randomize()
 				var num = randi()%3
 				dir = crossRoadsDirectionOptions[dir][num]
+				
+				if dir == 0:
+					offset_z = -0.3
+				elif dir == 2:
+					offset_z = 0.3
+
+				if dir == 1:
+					offset_x = 0.3
+				elif dir == 3:
+					offset_x = -0.3
+				
 			1: # t junction road down
 				randomize()
 				if dir == 0: # right or down
 					dir = 0 if randi()%2 == 0 else 1
+					offset_x = 0.3
+					offset_z = -0.3
 				elif dir == 2: # left or down
 					dir = 2 if randi()%2 == 0 else 1
+					offset_x = 0.3
+					offset_z = 0.3
 				elif dir == 3: # right or left
-					dir = 0 if randi()%2 == 0 else 2
+					var rand = randi()%2
+					dir = 0 if rand == 0 else 2
+					offset_x = -0.3
+					offset_z = -0.3 if rand == 0 else 0.3
 			2: # t junction road left
 				if dir == 0: # down or up
-					dir = 1 if randi()%2 == 0 else 3
+					var rand = randi()%2
+					dir = 1 if rand == 0 else 3
+					offset_x = 0.3 if rand == 0 else -0.3
+					offset_z = -0.3
 				elif dir == 1: # down or left
 					dir = 1 if randi()%2 == 0 else 2
+					offset_x = 0.3
+					offset_z = 0.3
 				elif dir == 3: # up or left
 					dir = 3 if randi()%2 == 0 else 2
+					offset_x = -0.3
+					offset_z = 0.3
 			3: # top right curved road:
 				dir = 1 if dir == 0 else 2
+				offset_x = 0.3 if dir == 1 else -0.3
+				offset_z = -0.3 if dir == 1 else 0.3
 			4: # t junction road up
 				if dir == 0: # right or up
 					dir = 0 if randi()%2 == 0 else 3
+					offset_x = -0.3
+					offset_z = -0.3
 				elif dir == 1: # left or right
-					dir = 2 if randi()%2 == 0 else 0
+					var rand = randi()%2
+					dir = 2 if rand == 0 else 0
+					offset_x = 0.3
+					offset_z = 0.3 if rand == 0 else -0.3
 				elif dir == 2: # left or up
 					dir = 2 if randi()%2 == 0 else 3
+					offset_x = -0.3
+					offset_z = 0.3
 			5: # horizontal road
 				dir = 0 if dir == 0 else 2
+				offset_z = -0.3 if dir == 0 else 0.3
 			6: # bottom right curved road
 				dir = 3 if dir == 0 else 2
+				offset_x = -0.3 if dir == 3 else 0.3
+				offset_z = -0.3 if dir == 3 else 0.3
 			7: # right dead end road
 				dir = 2
 			8: # t junction road right
 				if dir == 1: # right or down
 					dir = 0 if randi()%2 == 0 else 1
+					offset_x = 0.3
+					offset_z = -0.3
 				elif dir == 2: # down or up
-					dir = 1 if randi()%2 == 0 else 3
+					var rand = randi()%2
+					dir = 1 if rand == 0 else 3
+					offset_x = 0.3 if rand == 0 else -0.3
+					offset_z = 0.3
 				elif dir == 3: # up or right
 					dir = 3 if randi()%2 == 0 else 0
-			9: # top left road
+					offset_x = -0.3
+					offset_z = -0.3
+			9: # top left road curved road
 				dir = 0 if dir == 3 else 1
+				offset_x = -0.3 if dir == 0 else 0.3
+				offset_z = -0.3 if dir == 0 else 0.3
 			10: # vertical road
-				dir = 1 if dir == 1 else 3 
+				dir = 1 if dir == 1 else 3
+				offset_x = 0.3 if dir == 1 else -0.3
 			11: # top dead end road
 				dir = 1
 			12: # bottom left curved road
 				dir = 0 if dir == 1 else 3
+				offset_x = 0.3 if dir == 0 else -0.3
+				offset_z = -0.3 if dir == 0 else 0.3
 			13: # left dead end road
 				dir = 0
 			14: # bottom dead end road
@@ -156,8 +210,8 @@ func generatePath():
 
 func followPath():
 	var target = path[pathIndex]
+#	+Vector3(0, 0, 1)
 	var dist = global_transform.origin.distance_to(target)
-	
 	if dist < 0.5:
 		pathIndex = (pathIndex + 1) % len(path)
 	

@@ -50,10 +50,10 @@ var map_seed = 675343778
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	#while 1:
-		if !map_seed:
-			map_seed = OS.get_unix_time()
-		seed(map_seed)
-		randomize()
+#		if !map_seed:
+#			map_seed = OS.get_unix_time()
+#		seed(map_seed)
+#		randomize()
 		while road_instances:
 			road_instances[0].queue_free()
 			road_instances.erase(road_instances[0])
@@ -62,21 +62,7 @@ func _ready():
 		erase_walls()
 		Globals.roads = roads
 		draw_roads()
-		for i in range (300):
-			var vehicle = load("res://models/" + ("Truck" if randi()%2 == 0 else "Car") + ".tscn")
-			var vehicle_instance = vehicle.instance().duplicate()
-			vehicle_instance.set_name("person_"+str(i))
-			var child = vehicle_instance.get_child(0)
-			var model = child.get_child(0).get_child(0).get_child(0)
-			var mat = model.get_surface_material(0).duplicate()
-			randomize()
-			mat.albedo_color = Color(randf(), randf(), randf(), randf())
-			model.set_surface_material(0, mat)
-			child.translation.y = 0.1
-			child.translation.x = rand_range(-29, -29)
-			child.translation.z = rand_range(-29, -29)
-			add_child(vehicle_instance)
-			yield(get_tree().create_timer(1), "timeout")
+		generate_vehicles()
 
 #		yield(get_tree().create_timer(1), "timeout")
 
@@ -174,8 +160,8 @@ func place_buildings(road):
 		randomize()
 		var rand = randf()
 		var buildingNumber = 0
-		print(buildingNumber)
 		
+		# Chooses the buiding type that will be rendered
 		if rand < 0.1:
 			buildingNumber = 1
 		elif rand < 0.2:
@@ -187,6 +173,7 @@ func place_buildings(road):
 		
 		var building = load("res://models/Building" + str(buildingNumber) + "Model.tscn").instance()
 
+		# Changes the building y position based on how tall it is
 		if buildingNumber == 1:
 			y_pos = 2
 		elif buildingNumber == 3:
@@ -198,3 +185,21 @@ func place_buildings(road):
 		road_instances.append(building)
 		self.add_child(building)
 		building.set_owner(self)
+
+
+func generate_vehicles():
+	for i in range (300):
+		var vehicle = load("res://models/" + ("Truck" if randi()%2 == 0 else "Car") + ".tscn")
+		var vehicle_instance = vehicle.instance().duplicate()
+		vehicle_instance.set_name("vehicle_"+str(i))
+		var child = vehicle_instance.get_child(0)
+		var model = child.get_child(0).get_child(0).get_child(0)
+		var mat = model.get_surface_material(0).duplicate()
+		randomize()
+		mat.albedo_color = Color(randf(), randf(), randf(), randf())
+		model.set_surface_material(0, mat)
+		child.translation.y = 0.1
+		child.translation.x = -29
+		child.translation.z = -29
+		add_child(vehicle_instance)
+		yield(get_tree().create_timer(1), "timeout")
