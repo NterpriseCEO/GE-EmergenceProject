@@ -50,10 +50,10 @@ var map_seed = 675343778
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	#while 1:
-#		if !map_seed:
-#			map_seed = OS.get_unix_time()
-#		seed(map_seed)
-#		randomize()
+		if !map_seed:
+			map_seed = OS.get_unix_time()
+		seed(map_seed)
+		randomize()
 		while road_instances:
 			road_instances[0].queue_free()
 			road_instances.erase(road_instances[0])
@@ -63,6 +63,7 @@ func _ready():
 		Globals.roads = roads
 		draw_roads()
 		generate_vehicles()
+		generate_people()
 
 #		yield(get_tree().create_timer(1), "timeout")
 
@@ -186,6 +187,16 @@ func place_buildings(road):
 		self.add_child(building)
 		building.set_owner(self)
 
+func generate_people():
+	for i in range(300):
+		var person = load("res://models/Person.tscn").instance().duplicate()
+		var child = person.get_child(0)
+		child.translation.y = 0.1
+		child.translation.x = -29
+		child.translation.z = -29
+		child.set_name("person_"+str(i))
+		add_child(person)
+		yield(get_tree().create_timer(1), "timeout")
 
 func generate_vehicles():
 	for i in range (300):

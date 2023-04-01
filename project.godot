@@ -9,13 +9,19 @@
 config_version=4
 
 _global_script_classes=[ {
-"base": "SteeringBehavior",
+"base": "Reference",
 "class": "Avoidance",
 "language": "GDScript",
 "path": "res://scripts/ObstacleAvoidance.gd"
+}, {
+"base": "RigidBody",
+"class": "BoidMovement",
+"language": "GDScript",
+"path": "res://scripts/BoidMovement.gd"
 } ]
 _global_script_class_icons={
-"Avoidance": ""
+"Avoidance": "",
+"BoidMovement": ""
 }
 
 [application]
@@ -27,6 +33,7 @@ config/icon="res://icon.png"
 [autoload]
 
 Globals="*res://scripts/Globals.gd"
+DebugDraw="*res://scripts/debug_draw.gd"
 
 [display]
 

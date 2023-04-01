@@ -156,6 +156,9 @@ font_data = SubResource( 17 )
 
 [node name="Spatial" type="Spatial"]
 script = ExtResource( 2 )
+__meta__ = {
+"_editor_description_": "This is a description"
+}
 
 [node name="KinematicBody2" type="KinematicBody" parent="."]
 

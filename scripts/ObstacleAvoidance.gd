@@ -1,4 +1,4 @@
-class_name Avoidance extends SteeringBehavior
+class_name Avoidance
 	
 # Declare member variables here. Examples:
 # var a = 2
@@ -16,6 +16,8 @@ var space_state
 
 var needs_updating = true
 
+var boid
+
 func draw_gizmos():
 	for i in feelers.size():
 		var feeler = feelers[i]		
@@ -32,7 +34,7 @@ func needs_updating():
 func _physics_process(var delta):
 	if needs_updating:
 		update_feelers()
-		needs_updating = false		
+		needs_updating = false
 
 func feel(local_ray):
 	var feeler = {}
