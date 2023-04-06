@@ -26,6 +26,26 @@ var height = 30
 
 var erase_fraction = 0.2
 
+var building_count_by_type = [0, 0, 0, 0]
+
+var road_meshes = {
+	"cross_roads": 0,
+	"t_junction_road_down": 0,
+	"t_junction_road_left": 0,
+	"tr_curved_road": 0,
+	"t_junction_road_up": 0,
+	"horizontal_road": 0,
+	"br_curved_road": 0,
+	"right_dead_end_road": 0,
+	"t_junction_road_right": 0,
+	"tl_curved_road": 0,
+	"vertical_road": 0,
+	"top_dead_end_road": 0,
+	"bl_curved_road": 0,
+	"left_dead_end_road": 0,
+	"bottom_dead_end_road": 0
+}
+
 var road_textures = [
 	"cross_roads",
 	"t_junction_road_down",
@@ -62,10 +82,13 @@ func _ready():
 		erase_walls()
 		Globals.roads = roads
 		draw_roads()
+		
+#		for x in range(30):
+#			for z in range(30):
+#				$"Node/MultiMeshInstance".multimesh.set_instance_transform(z*30+x, Transform(Basis(), Vector3(-29+(x*2), 0.01, -29+(z*2))))
+
 		generate_vehicles()
 		generate_people()
-
-#		yield(get_tree().create_timer(1), "timeout")
 
 func check_neighbors(cell, unvisited):
 	# returns an array of cell's unvisited neighbors
@@ -121,18 +144,14 @@ func draw_roads():
 
 		if road_textures[roads[road]] == "empty_cell":
 			# Randomly decides to draw one of 2 building types
-			place_buildings(road)
+			place_building(road)
 		else:
-			# Roads tiles are placed here and the correct texture
-			var physical_road = $road1.duplicate();
-			physical_road.translation = Vector3(-29+(road.x*2), 0.01, -29+(road.y*2))
-			var mat = physical_road.get_surface_material(0).duplicate()
-			mat.albedo_texture = tex
-			physical_road.set_surface_material(0, mat)
-			road_instances.append(physical_road)
-			self.add_child(physical_road)
-			physical_road.set_owner(self)
-		#yield(get_tree().create_timer(0.001), "timeout")
+			var node = get_node("Node/"+road_textures[roads[road]])
+			var node_mesh_count = road_meshes[road_textures[roads[road]]]
+			node.multimesh.set_visible_instance_count(node_mesh_count+1)
+			node.multimesh.set_instance_transform(node_mesh_count, Transform(Basis(), Vector3(-29+(road.x*2), 0.01, -29+(road.y*2))))
+			node_mesh_count+=1
+			road_meshes[road_textures[roads[road]]] = node_mesh_count
 
 func erase_walls():
 	# randomly remove a number of the map's walls
@@ -155,7 +174,7 @@ func erase_walls():
 				roads[cell+neighbor/2] = 10
 
 
-func place_buildings(road):
+func place_building(road):
 	if randf() < 0.8:
 		var y_pos = 1
 		randomize()
@@ -172,7 +191,7 @@ func place_buildings(road):
 		else:
 			buildingNumber = 2
 		
-		var building = load("res://models/Building" + str(buildingNumber) + "Model.tscn").instance()
+#		var building = load("res://models/Building" + str(buildingNumber) + "Model.tscn").instance()
 
 		# Changes the building y position based on how tall it is
 		if buildingNumber == 1:
@@ -182,10 +201,11 @@ func place_buildings(road):
 		elif buildingNumber == 4:
 			y_pos = 3
 		
-		building.translation = Vector3(-29+(road.x*2), y_pos, -29+(road.y*2))
-		road_instances.append(building)
-		self.add_child(building)
-		building.set_owner(self)
+		var node = get_node("Node/building"+str(buildingNumber))
+		if node:
+			node.multimesh.set_visible_instance_count(building_count_by_type[buildingNumber-1])
+			node.multimesh.set_instance_transform(building_count_by_type[buildingNumber-1], Transform(Basis(), Vector3(-29+(road.x*2), y_pos, -29+(road.y*2))))
+			building_count_by_type[buildingNumber-1]+=1
 
 func generate_people():
 	for i in range(300):

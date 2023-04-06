@@ -20,4 +20,5 @@ shape = SubResource( 1 )
 
 [node name="Spotlight" type="SpotLight" parent="VehicleBody"]
 transform = Transform( 1, 0, 0, 0, -1, 8.74228e-08, 0, -8.74228e-08, -1, 0, 0.15, 0.233616 )
+visible = false
 shadow_enabled = true
