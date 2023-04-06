@@ -46,6 +46,8 @@ var road_meshes = {
 	"bottom_dead_end_road": 0
 }
 
+var lights_count = 0
+
 var road_textures = [
 	"cross_roads",
 	"t_junction_road_down",
@@ -113,7 +115,7 @@ func make_roads():
 	unvisited.erase(current)
 	
 	# execute recursive backtracker algorithm
-	
+
 	while unvisited:
 		var neighbors = check_neighbors(current, unvisited)
 		if neighbors.size() > 0:
@@ -153,6 +155,15 @@ func draw_roads():
 			node_mesh_count+=1
 			road_meshes[road_textures[roads[road]]] = node_mesh_count
 
+			if road_textures[roads[road]] == "horizontal_road" and randf() < 0.5:
+				var lights = get_node("Node/lights")
+				lights.multimesh.set_visible_instance_count(lights_count+1)
+				lights.multimesh.set_instance_transform(lights_count, Transform(Basis(), Vector3(-29+(road.x*2), 0.01, -28.2+(road.y*2))))
+				var spotlight = get_node("SpotLight").duplicate()
+				spotlight.translation = Vector3(-29+(road.x*2), 1, -29+(road.y*2))
+				self.add_child(spotlight)
+				lights_count+=1
+
 func erase_walls():
 	# randomly remove a number of the map's walls
 	for i in range(int(width * height * erase_fraction)):
@@ -180,7 +191,7 @@ func place_building(road):
 		randomize()
 		var rand = randf()
 		var buildingNumber = 0
-		
+
 		# Chooses the buiding type that will be rendered
 		if rand < 0.1:
 			buildingNumber = 1
@@ -190,8 +201,6 @@ func place_building(road):
 			buildingNumber = 3
 		else:
 			buildingNumber = 2
-		
-#		var building = load("res://models/Building" + str(buildingNumber) + "Model.tscn").instance()
 
 		# Changes the building y position based on how tall it is
 		if buildingNumber == 1:
@@ -200,7 +209,7 @@ func place_building(road):
 			y_pos = 0.5
 		elif buildingNumber == 4:
 			y_pos = 3
-		
+
 		var node = get_node("Node/building"+str(buildingNumber))
 		if node:
 			node.multimesh.set_visible_instance_count(building_count_by_type[buildingNumber-1])
@@ -224,11 +233,11 @@ func generate_vehicles():
 		var vehicle_instance = vehicle.instance().duplicate()
 		vehicle_instance.set_name("vehicle_"+str(i))
 		var child = vehicle_instance.get_child(0)
-		var model = child.get_child(0).get_child(0).get_child(0)
-		var mat = model.get_surface_material(0).duplicate()
-		randomize()
-		mat.albedo_color = Color(randf(), randf(), randf(), randf())
-		model.set_surface_material(0, mat)
+#		var model = child.get_child(0).get_child(0).get_child(0)
+#		var mat = model.get_surface_material(0).duplicate()
+#		randomize()
+#		mat.albedo_color = Color(randf(), randf(), randf(), randf())
+#		model.set_surface_material(0, mat)
 		child.translation.y = 0.1
 		child.translation.x = -29
 		child.translation.z = -29

@@ -30,7 +30,7 @@ func _input(event):
 	velocity = move_and_slide((velocity*translation.y))
 
 	# clamps the y value between 2 and 100
-	translation.y = clamp(translation.y, 2, 100)
+	translation.y = clamp(translation.y, 2, 70)
 	rotation_degrees = cam_x_rotation
 
 func _physics_process(delta):
