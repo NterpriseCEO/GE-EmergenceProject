@@ -241,5 +241,8 @@ func generate_vehicles():
 		child.translation.y = 0.1
 		child.translation.x = -29
 		child.translation.z = -29
+		# Adds the vehicle to the list of vehicles
+		# This is used to randomly select a vehicle to follow
+		Globals.vehicles.append(child)
 		add_child(vehicle_instance)
 		yield(get_tree().create_timer(1), "timeout")
