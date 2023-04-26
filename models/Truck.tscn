@@ -6,26 +6,8 @@
 [sub_resource type="BoxShape" id=11]
 extents = Vector3( 1, 1.25, 2.5 )
 
-[sub_resource type="GDScript" id=10]
-script/source = "extends Spatial
-
-
-# Declare member variables here. Examples:
-# var a = 2
-# var b = \"text\"
-#var car = load(\"res://CarModel.tscn\")
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-#	var instance = car.instance().duplicate()
-#	add_child(instance)
-	pass
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
-"
+[sub_resource type="BoxShape" id=12]
+extents = Vector3( 0.277785, 0.1, 0.3 )
 
 [node name="Car" type="Spatial"]
 
@@ -37,6 +19,16 @@ script = ExtResource( 1 )
 unique_name_in_owner = true
 transform = Transform( 0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0.15, 0 )
 shape = SubResource( 11 )
-script = SubResource( 10 )
+disabled = true
 
 [node name="truck" parent="VehicleBody/CollisionShape" instance=ExtResource( 2 )]
+
+[node name="Area" type="Area" parent="VehicleBody"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0 )
+
+[node name="CollisionShape" type="CollisionShape" parent="VehicleBody/Area"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.00477019, 0.0684676 )
+shape = SubResource( 12 )
+
+[connection signal="body_entered" from="VehicleBody/Area" to="VehicleBody" method="_on_Area_body_entered"]
+[connection signal="body_exited" from="VehicleBody/Area" to="VehicleBody" method="_on_Area_body_exited"]

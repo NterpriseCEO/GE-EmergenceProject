@@ -217,7 +217,7 @@ func place_building(road):
 			building_count_by_type[buildingNumber-1]+=1
 
 func generate_people():
-	for i in range(300):
+	for i in range(150):
 		var person = load("res://models/Person.tscn").instance().duplicate()
 		var child = person.get_child(0)
 		child.translation.y = 0.1
@@ -228,7 +228,7 @@ func generate_people():
 		yield(get_tree().create_timer(1), "timeout")
 
 func generate_vehicles():
-	for i in range (300):
+	for i in range (150):
 		var vehicle = load("res://models/" + ("Truck" if randi()%2 == 0 else "Car") + ".tscn")
 		var vehicle_instance = vehicle.instance().duplicate()
 		vehicle_instance.set_name("vehicle_"+str(i))

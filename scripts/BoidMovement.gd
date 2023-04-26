@@ -24,6 +24,7 @@ var pathIndex = 0
 var velocity = Vector3.ZERO
 var force = Vector3.ZERO
 var maxForce = 7
+var forceMultiplier = 1
 var speed = 0
 var acceleration = Vector3.ZERO
 
@@ -40,15 +41,22 @@ var crossRoadsDirectionOptions = [
 
 var xPos = 0
 var zPos = 0
+var startPos
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	self.pathIndex = 0
 	self.path = []
 	self.velocity = Vector3.ZERO
-	self.x = 0
-	self.z = 0
-	
+#	startPos = Globals.vehicleStartPositions[Globals.vehicleCounter];
+#	self.x = startPos[0]
+#	self.z = startPos[1]
+
+	self.x = 15
+	self.z = 15
+
+	translation = Vector3(-29 + (x*2) + offset_x, 0, -29 + (z*2) + offset_z)
+
 	boid = get_parent()
 	space_state = boid.get_world().direct_space_state
 	
@@ -83,16 +91,17 @@ func _process(delta):
 func _physics_process(var delta):
 	if len(path) == 10000:
 		force = followPath()*3
-		if needsUpdating:
-			update_feelers()
-			needsUpdating = false
+
+		var direct_state = get_world().direct_space_state
+
 		force = force.limit_length(maxForce)
 		
 		acceleration = force / 0.5
 		velocity += acceleration * delta
 		speed = velocity.length()
 
-		if speed > 0:
+
+		if speed > 0 and forceMultiplier == 1:
 			velocity = velocity.limit_length(velocity_length)
 			transform.origin += velocity * delta
 			transform.origin.y = 0
@@ -282,3 +291,11 @@ func seek(target: Vector3):
 	var desired = toTarget * 2
 
 	return desired - velocity
+
+
+func _on_Area_body_entered(body):
+	forceMultiplier = 0
+
+
+func _on_Area_body_exited(body):
+	forceMultiplier = 1

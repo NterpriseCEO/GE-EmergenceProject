@@ -1,0 +1,37 @@
+[remap]
+
+importer="texture"
+type="StreamTexture"
+path.s3tc="res://.import/vertical_road.png-b3e6d6aa3d6a18c3865fc9e6c3ea205a.s3tc.stex"
+path.etc2="res://.import/vertical_road.png-b3e6d6aa3d6a18c3865fc9e6c3ea205a.etc2.stex"
+metadata={
+"imported_formats": [ "s3tc", "etc2" ],
+"vram_texture": true
+}
+
+[deps]
+
+source_file="res://textures/road_normal_maps/vertical_road.png"
+dest_files=[ "res://.import/vertical_road.png-b3e6d6aa3d6a18c3865fc9e6c3ea205a.s3tc.stex", "res://.import/vertical_road.png-b3e6d6aa3d6a18c3865fc9e6c3ea205a.etc2.stex" ]
+
+[params]
+
+compress/mode=2
+compress/lossy_quality=0.7
+compress/hdr_mode=0
+compress/bptc_ldr=0
+compress/normal_map=1
+flags/repeat=true
+flags/filter=true
+flags/mipmaps=true
+flags/anisotropic=false
+flags/srgb=2
+process/fix_alpha_border=true
+process/premult_alpha=false
+process/HDR_as_SRGB=false
+process/invert_color=false
+process/normal_map_invert_y=false
+stream=false
+size_limit=0
+detect_3d=false
+svg/scale=1.0
