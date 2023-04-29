@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://models/Material.material" type="Material" id=1]
 
@@ -17,7 +17,15 @@ surfaces/0 = {
 "vertex_count": 9350
 }
 
+[sub_resource type="SpatialMaterial" id=3]
+flags_unshaded = true
+params_cull_mode = 1
+params_grow = true
+params_grow_amount = 0.5
+albedo_color = Color( 0.345098, 0.321569, 0.101961, 1 )
+
 [sub_resource type="SpatialMaterial" id=2]
+next_pass = SubResource( 3 )
 albedo_color = Color( 1, 0.701961, 0.196078, 1 )
 
 [node name="car" type="Spatial"]
