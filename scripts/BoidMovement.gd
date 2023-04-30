@@ -3,7 +3,7 @@ class_name BoidMovement extends RigidBody
 enum ForceDirection {Normal, Incident, Up, Braking}
 export var direction = ForceDirection.Normal
 export var feeler_angle = 60
-export var feeler_length = 0.2
+export var feeler_length = 1
 export var updates_per_second = 10
 
 var center_offset = 0.3
@@ -13,7 +13,6 @@ var feelers = []
 var space_state: PhysicsDirectSpaceState
 
 var needsUpdating = true
-var boid
 
 var path = []
 
@@ -57,8 +56,7 @@ func _ready():
 
 	translation = Vector3(-29 + (x*2) + offset_x, 0, -29 + (z*2) + offset_z)
 
-	boid = get_parent()
-	space_state = boid.get_world().direct_space_state
+	space_state = self.get_world().direct_space_state
 	
 	var timer = Timer.new()
 	add_child(timer)	
@@ -74,7 +72,7 @@ func draw_gizmos():
 	for feeler in feelers:
 
 		if feeler.hit:
-			DebugDraw.draw_line(boid.global_transform.origin, feeler.hit_target, Color.chartreuse)
+			DebugDraw.draw_line(self.global_transform.origin, feeler.hit_target, Color.chartreuse)
 			DebugDraw.draw_arrow_line(feeler.hit_target, feeler.hit_target + feeler.force, Color.red, 0.1)
 		else:
 			DebugDraw.draw_line(Vector3(0, 1, 0), Vector3(3, 1, 0), Color.chartreuse)
@@ -91,61 +89,63 @@ func _process(delta):
 func _physics_process(var delta):
 	if len(path) == 10000:
 		force = followPath()*3
+		
+#		update_feelers()
 
 		var direct_state = get_world().direct_space_state
 
 		force = force.limit_length(maxForce)
-		
+
 		acceleration = force / 0.5
 		velocity += acceleration * delta
 		speed = velocity.length()
 
 
-		if speed > 0 and forceMultiplier == 1:
+		if speed > 0:
 			velocity = velocity.limit_length(velocity_length)
-			transform.origin += velocity * delta
+			transform.origin += velocity * delta*forceMultiplier
 			transform.origin.y = 0
-			apply_impulse(velocity.rotated(Vector3.UP, rotation.y), Vector3.ZERO)
+			apply_impulse(velocity.rotated(Vector3.UP, rotation.y)*forceMultiplier, Vector3.ZERO)
 
 		var tempUp = transform.basis.y.linear_interpolate(Vector3.UP + (acceleration * 0.1), 0.1)
-		look_at(global_transform.origin - velocity, tempUp)
+		look_at(global_transform.origin - velocity*0.1, tempUp)
 
 
 func feel(local_ray):
 	var feeler = {}
-	var ray_end = boid.global_transform.xform(local_ray)
-	var result = space_state.intersect_ray(boid.global_transform.origin, ray_end)
-#	var result = space_state.intersect_ray(translation, local_ray)
+	var ray_end = self.global_transform.xform(local_ray)
+	var result = space_state.intersect_ray(self.global_transform.origin, ray_end, [self], self.collision_mask)
 	feeler.end = ray_end
 	feeler.hit = result
-#	print(result)
 	if result:
-#		print("hit!!!")
 		feeler.hit_target = result.position
-		var to_boid = result.position - boid.global_transform.origin
-		var force_mag = to_boid.length()
+		feeler.normal = result.normal
+		var to_boid = self.global_transform.origin - result.position 
+		var force_mag = ((feeler_length - to_boid.length()) / feeler_length)
 		match direction:
 			ForceDirection.Normal:
 				feeler.force = result.normal * force_mag
 			ForceDirection.Incident:
-				feeler.force = to_boid.reflect(result.normal) * force_mag
+				feeler.force = to_boid.reflect(result.normal).normalized() * force_mag
 			ForceDirection.Up:
 				feeler.force = Vector3.UP * force_mag
 			ForceDirection.Braking:
-				feeler.force = to_boid * force_mag
-		force += feeler.force*Vector3(1, 0, 1)
+				feeler.force = to_boid.normalized() * force_mag
+		force += feeler.force
+		force.y = 0
 	return feeler
 
 
 func update_feelers():
+	force = Vector3.ZERO
 	feelers.clear()
 	var forwards = Vector3.BACK * feeler_length
 	feelers.push_back(feel(forwards))
-	feelers.push_back(feel(Quat(Vector3.UP, feeler_angle) * forwards))
-#	feelers.push_back(feel(Quat(Vector3.UP, -feeler_angle) * forwards))
+	feelers.push_back(feel(Quat(Vector3.UP, deg2rad(feeler_angle)) * forwards))
+	feelers.push_back(feel(Quat(Vector3.UP, deg2rad(-feeler_angle)) * forwards))
 
-	feelers.push_back(feel(Quat(Vector3.RIGHT, feeler_angle) * forwards))
-	feelers.push_back(feel(Quat(Vector3.RIGHT, -feeler_angle) * forwards))
+	feelers.push_back(feel(Quat(Vector3.RIGHT, deg2rad(feeler_angle)) * forwards))
+	feelers.push_back(feel(Quat(Vector3.RIGHT, deg2rad(-feeler_angle)) * forwards))
 
 
 # here dir can be 0, 2, 3 or 3 which equals
@@ -294,8 +294,24 @@ func seek(target: Vector3):
 
 
 func _on_Area_body_entered(body):
-	forceMultiplier = 0
+	forceMultiplier = 0.1
 
 
 func _on_Area_body_exited(body):
+	forceMultiplier = 1
+
+
+func _on_Area_area_entered(area):
+	forceMultiplier = 0.1
+
+
+func _on_Area_area_exited(area):
+	forceMultiplier = 1
+
+
+func _on_Area_body_shape_entered(body_rid, body, body_shape_index, local_shape_index):
+	forceMultiplier = 0.1
+
+
+func _on_Area_body_shape_exited(body_rid, body, body_shape_index, local_shape_index):
 	forceMultiplier = 1

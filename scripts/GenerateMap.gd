@@ -148,7 +148,7 @@ func draw_roads():
 			# Randomly decides to draw one of 2 building types
 			place_building(road)
 		else:
-			var node = get_node("Node/"+road_textures[roads[road]])
+			var node = get_node("MultiMeshes/"+road_textures[roads[road]])
 			var node_mesh_count = road_meshes[road_textures[roads[road]]]
 			node.multimesh.set_visible_instance_count(node_mesh_count+1)
 			node.multimesh.set_instance_transform(node_mesh_count, Transform(Basis(), Vector3(-29+(road.x*2), 0.01, -29+(road.y*2))))
@@ -156,7 +156,7 @@ func draw_roads():
 			road_meshes[road_textures[roads[road]]] = node_mesh_count
 
 			if road_textures[roads[road]] == "horizontal_road" and randf() < 0.5:
-				var lights = get_node("Node/lights")
+				var lights = get_node("MultiMeshes/lights")
 				lights.multimesh.set_visible_instance_count(lights_count+1)
 				lights.multimesh.set_instance_transform(lights_count, Transform(Basis(), Vector3(-29+(road.x*2), 0.01, -28.2+(road.y*2))))
 				var spotlight = get_node("SpotLight").duplicate()
@@ -210,7 +210,7 @@ func place_building(road):
 		elif buildingNumber == 4:
 			y_pos = 3
 
-		var node = get_node("Node/building"+str(buildingNumber))
+		var node = get_node("MultiMeshes/building"+str(buildingNumber))
 		if node:
 			node.multimesh.set_visible_instance_count(building_count_by_type[buildingNumber-1])
 			node.multimesh.set_instance_transform(building_count_by_type[buildingNumber-1], Transform(Basis(), Vector3(-29+(road.x*2), y_pos, -29+(road.y*2))))
@@ -218,31 +218,35 @@ func place_building(road):
 
 func generate_people():
 	for i in range(150):
-		var person = load("res://models/Person.tscn").instance().duplicate()
-		var child = person.get_child(0)
-		child.translation.y = 0.1
-		child.translation.x = -29
-		child.translation.z = -29
-		child.set_name("person_"+str(i))
-		add_child(person)
+		add_person()
 		yield(get_tree().create_timer(1), "timeout")
+
+func add_person():
+	var person = load("res://models/Person.tscn").instance().duplicate()
+	var child = person.get_child(0)
+	child.translation.y = 0.1
+	child.translation.x = -29
+	child.translation.z = -29
+	add_child(person)
+
+func add_vehicle():
+	var vehicle = load("res://models/" + ("Truck" if randi()%2 == 0 else "Car") + ".tscn")
+	var vehicle_instance = vehicle.instance().duplicate()
+	var child = vehicle_instance.get_child(0)
+	var model = child.get_child(0).get_child(0).get_child(0)
+	var mat = model.get_surface_material(0).duplicate()
+	randomize()
+	mat.albedo_color = Color(randf(), randf(), randf(), randf())
+	model.set_surface_material(0, mat)
+	child.translation.y = 0.1
+	child.translation.x = -29
+	child.translation.z = -29
+	# Adds the vehicle to the list of vehicles
+	# This is used to randomly select a vehicle to follow
+	Globals.vehicles.append(child)
+	add_child(vehicle_instance)
 
 func generate_vehicles():
 	for i in range (150):
-		var vehicle = load("res://models/" + ("Truck" if randi()%2 == 0 else "Car") + ".tscn")
-		var vehicle_instance = vehicle.instance().duplicate()
-		vehicle_instance.set_name("vehicle_"+str(i))
-		var child = vehicle_instance.get_child(0)
-#		var model = child.get_child(0).get_child(0).get_child(0)
-#		var mat = model.get_surface_material(0).duplicate()
-#		randomize()
-#		mat.albedo_color = Color(randf(), randf(), randf(), randf())
-#		model.set_surface_material(0, mat)
-		child.translation.y = 0.1
-		child.translation.x = -29
-		child.translation.z = -29
-		# Adds the vehicle to the list of vehicles
-		# This is used to randomly select a vehicle to follow
-		Globals.vehicles.append(child)
-		add_child(vehicle_instance)
+		add_vehicle()
 		yield(get_tree().create_timer(1), "timeout")
