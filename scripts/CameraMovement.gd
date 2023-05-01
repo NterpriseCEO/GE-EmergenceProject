@@ -32,7 +32,7 @@ func _input(event):
 		Input.get_action_strength("q") - Input.get_action_strength("e"),
 		Input.get_action_strength("ui_down") - Input.get_action_strength("ui_up")
 	).normalized().rotated(Vector3.UP, rotation.y)
-	
+
 	velocity.x = move_dir.x
 	velocity.y = move_dir.y
 	velocity.z = move_dir.z
@@ -40,16 +40,13 @@ func _input(event):
 	velocity = move_and_slide((velocity*translation.y))
 
 	# clamps the y value between 2 and 100
-	translation.y = clamp(translation.y, 2, 70)
+	translation.y = clamp(translation.y, 0.5, 70)
 	rotation_degrees = cam_x_rotation
 
 func _process(delta):
 	if randomVehicle and isFollowCam:
-		translation = randomVehicle.translation+Vector3(0, 0.5, 0)
 		var rot = randomVehicle.rotation
-		rotation_degrees = Vector3(rad2deg(rot.x),rad2deg(rot.y)-180,0)
-#		-Vector3(0, 180, 0)
-#		print(randomVehicle.rotation)
-
-func _physics_process(delta):
-	pass
+		translation = lerp(translation, randomVehicle.translation+Vector3(0, 0.5, 0), 0.05)
+		velocity = translation
+		rotation_degrees = lerp(rotation_degrees, Vector3(rad2deg(rot.x),rad2deg(rot.y)-180,0), 0.05)
+		cam_x_rotation = rotation_degrees

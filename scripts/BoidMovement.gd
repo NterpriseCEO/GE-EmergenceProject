@@ -47,14 +47,12 @@ func _ready():
 	self.pathIndex = 0
 	self.path = []
 	self.velocity = Vector3.ZERO
-#	startPos = Globals.vehicleStartPositions[Globals.vehicleCounter];
-#	self.x = startPos[0]
-#	self.z = startPos[1]
 
 	self.x = 15
 	self.z = 15
 
-	translation = Vector3(-29 + (x*2) + offset_x, 0, -29 + (z*2) + offset_z)
+	# Sets the boid position to the ceneter of the map
+	translation = Vector3(offset_x, 0, offset_z)
 
 	space_state = self.get_world().direct_space_state
 	
@@ -80,6 +78,7 @@ func draw_gizmos():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 #	draw_gizmos()
+	# Reverses the path when the end of the path is met
 	if pathIndex == len(path)-1:
 		path.invert()
 	if len(Globals.roads) > 0 and len(path) == 0:
@@ -91,8 +90,6 @@ func _physics_process(var delta):
 		force = followPath()*3
 		
 #		update_feelers()
-
-		var direct_state = get_world().direct_space_state
 
 		force = force.limit_length(maxForce)
 
@@ -110,7 +107,7 @@ func _physics_process(var delta):
 		var tempUp = transform.basis.y.linear_interpolate(Vector3.UP + (acceleration * 0.1), 0.1)
 		look_at(global_transform.origin - velocity*0.1, tempUp)
 
-
+# Couldn't get this to work with the boids
 func feel(local_ray):
 	var feeler = {}
 	var ray_end = self.global_transform.xform(local_ray)
@@ -148,11 +145,13 @@ func update_feelers():
 	feelers.push_back(feel(Quat(Vector3.RIGHT, deg2rad(-feeler_angle)) * forwards))
 
 
-# here dir can be 0, 2, 3 or 3 which equals
+# Here dir can be 0, 1, 2 or 3 which equals
 # right, down, left or up
+# Offset refers to the position on the road i.e left side or right side
 func generatePath():
 	var firstRoad = Globals.roads[Vector2(x, z)]
-	
+
+	# Loops until a non empty tile is found
 	while firstRoad == 15:
 		x = clamp(x+1, 0, 29)
 		firstRoad = Globals.roads[Vector2(x, z)]
@@ -267,7 +266,8 @@ func generatePath():
 				dir = 0
 			14: # bottom dead end road
 				dir = 3
-		
+		# Path is generated in a given direction
+		# based on the direction calculated above
 		match dir:
 			0: x+=1
 			1: z+=1
@@ -278,13 +278,13 @@ func generatePath():
 
 func followPath():
 	var target = path[pathIndex]
-#	+Vector3(0, 0, 1)
 	var dist = global_transform.origin.distance_to(target)
 	if dist < 0.5:
 		pathIndex = (pathIndex + 1) % len(path)
 	
 	return seek(path[pathIndex])
 
+# Seeks the next path that a boid is supposed to move towards
 func seek(target: Vector3):
 	var toTarget = target - transform.origin
 	toTarget = toTarget.normalized()
@@ -293,6 +293,7 @@ func seek(target: Vector3):
 	return desired - velocity
 
 
+# Slows down boids when they are close to colliding with other boids
 func _on_Area_body_entered(body):
 	forceMultiplier = 0.1
 

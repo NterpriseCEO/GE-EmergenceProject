@@ -21,7 +21,7 @@ surfaces/0 = {
 flags_unshaded = true
 params_cull_mode = 1
 params_grow = true
-params_grow_amount = 0.5
+params_grow_amount = 0.1
 albedo_color = Color( 0.345098, 0.321569, 0.101961, 1 )
 
 [sub_resource type="SpatialMaterial" id=2]

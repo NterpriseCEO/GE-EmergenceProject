@@ -72,22 +72,18 @@ var map_seed = 675343778
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	#while 1:
-		if !map_seed:
-			map_seed = OS.get_unix_time()
-		seed(map_seed)
+		# Generates a random seed
+		# Which is used to generate random roads
 		randomize()
-		while road_instances:
-			road_instances[0].queue_free()
-			road_instances.erase(road_instances[0])
+		# Removes all road tiles if there are any
+#		while road_instances:
+#			road_instances[0].queue_free()
+#			road_instances.erase(road_instances[0])
 
 		make_roads()
 		erase_walls()
 		Globals.roads = roads
 		draw_roads()
-		
-#		for x in range(30):
-#			for z in range(30):
-#				$"Node/MultiMeshInstance".multimesh.set_instance_transform(z*30+x, Transform(Basis(), Vector3(-29+(x*2), 0.01, -29+(z*2))))
 
 		generate_vehicles()
 		generate_people()
@@ -108,27 +104,28 @@ func make_roads():
 	for x in range(width):
 		for y in range(height):
 			roads[Vector2(x, y)] =  N|E|S|W
+
 	for x in range(0, width, 2):
 		for y in range(0, height, 2):
 			unvisited.append(Vector2(x, y))
 	var current = Vector2(0, 0)
 	unvisited.erase(current)
 	
-	# execute recursive backtracker algorithm
+	# Executes recursive backtracker algorithm
 
 	while unvisited:
 		var neighbors = check_neighbors(current, unvisited)
 		if neighbors.size() > 0:
 			var next = neighbors[randi() % neighbors.size()]
 			stack.append(current)
-			# remove walls from *both* cells
+			# Remove walls from *both* cells
 			var dir = next - current
 
 			var current_walls = roads[current] - cell_walls[dir]
 			var next_walls = roads[next] - cell_walls[-dir]
 			roads[current] = current_walls
 			roads[next] =  next_walls
-			# insert intermediate cell
+			# Inserts intermediate cell
 			if dir.x != 0:
 				roads[current + dir/2] = 5;
 			else:
@@ -137,7 +134,6 @@ func make_roads():
 			unvisited.erase(current)
 		elif stack:
 			current = stack.pop_back()
-		# yield(get_tree(), 'idle_frame')
 
 func draw_roads():
 	# Loops through the tiles and draws the correct road
@@ -148,6 +144,7 @@ func draw_roads():
 			# Randomly decides to draw one of 2 building types
 			place_building(road)
 		else:
+			# Adds each tile to their respective multimesh for performance reasons
 			var node = get_node("MultiMeshes/"+road_textures[roads[road]])
 			var node_mesh_count = road_meshes[road_textures[roads[road]]]
 			node.multimesh.set_visible_instance_count(node_mesh_count+1)
@@ -165,7 +162,7 @@ func draw_roads():
 				lights_count+=1
 
 func erase_walls():
-	# randomly remove a number of the map's walls
+	# Randomly removes a number of the map's walls
 	for i in range(int(width * height * erase_fraction)):
 		var x = int(rand_range(2, width/2 - 2)) * 2
 		var y = int(rand_range(2, height/2 - 2)) * 2
@@ -210,6 +207,7 @@ func place_building(road):
 		elif buildingNumber == 4:
 			y_pos = 3
 
+		# Increments the amount of multimesh instancces of a given building to render
 		var node = get_node("MultiMeshes/building"+str(buildingNumber))
 		if node:
 			node.multimesh.set_visible_instance_count(building_count_by_type[buildingNumber-1])
@@ -223,10 +221,6 @@ func generate_people():
 
 func add_person():
 	var person = load("res://models/Person.tscn").instance().duplicate()
-	var child = person.get_child(0)
-	child.translation.y = 0.1
-	child.translation.x = -29
-	child.translation.z = -29
 	add_child(person)
 
 func add_vehicle():
@@ -238,9 +232,6 @@ func add_vehicle():
 	randomize()
 	mat.albedo_color = Color(randf(), randf(), randf(), randf())
 	model.set_surface_material(0, mat)
-	child.translation.y = 0.1
-	child.translation.x = -29
-	child.translation.z = -29
 	# Adds the vehicle to the list of vehicles
 	# This is used to randomly select a vehicle to follow
 	Globals.vehicles.append(child)
@@ -249,4 +240,5 @@ func add_vehicle():
 func generate_vehicles():
 	for i in range (150):
 		add_vehicle()
+		# Waits a second before adding more vehicles
 		yield(get_tree().create_timer(1), "timeout")
